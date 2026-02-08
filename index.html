@@ -1,148 +1,103 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>EarnVerse</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+// লোকাল স্টোরেজ থেকে ডাটা লোড করা
+        let userPoints = localStorage.getItem('points') ? parseInt(localStorage.getItem('points')) : 0;
+        
+        // কনভার্সন রেট (উদাহরণ: ১০০০ পয়েন্ট = $১)
+        const conversionRate = 0.001; 
 
-  <!-- Monetag SDK -->
-  <script src="//libtl.com/sdk.js"
-          data-zone="10584434"
-          data-sdk="show_10584434"></script>
+        // পেজ লোড হলে ব্যালেন্স আপডেট করা
+        updateBalanceDisplay();
 
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont;
-    }
+        // ব্যালেন্স আপডেট করার ফাংশন
+        function updateBalanceDisplay() {
+            document.getElementById('userPoints').innerText = userPoints;
+            document.getElementById('usdValue').innerText = (userPoints * conversionRate).toFixed(2);
+            localStorage.setItem('points', userPoints); // সেভ করা
+        }
 
-    body {
-      margin: 0;
-      background: linear-gradient(180deg, #0b1220, #020617);
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
+        // টোস্ট মেসেজ দেখানোর ফাংশন
+        function showToast(message, type = 'normal') {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.className = 'toast show';
+            if (type === 'success') toast.classList.add('success');
+            if (type === 'error') toast.classList.add('error');
+            
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 3000);
+        }
 
-    .app {
-      width: 100%;
-      max-width: 420px;
-      padding: 20px;
-      text-align: center;
-    }
+        // Monetag এড সিমুলেশন
+        function showMonetagAd() {
+            // আসল কোডে এখানে Monetag-এর স্ক্রিপ্ট বসবে
+            // উদাহরণ: window.monetag.showAd();
+            
+            simulateAdProcess(100, "Monetag");
+        }
 
-    h1 {
-      margin: 10px 0 5px;
-    }
+        // Adstora এড সিমুলেশন
+        function showAdstoraAd() {
+            // আসল কোডে এখানে Adstora-এর স্ক্রিপ্ট বসবে
+            simulateAdProcess(80, "Adstora");
+        }
 
-    .subtitle {
-      color: #94a3b8;
-      margin-bottom: 25px;
-    }
+        // এড দেখার প্রসেস (সিমুলেশন)
+        function simulateAdProcess(points, source) {
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
 
-    .card {
-      background: #111827;
-      border-radius: 16px;
-      padding: 25px;
-      margin-bottom: 20px;
-    }
+            // ৩ সেকেন্ড এড দেখার ভান করা হচ্ছে
+            setTimeout(() => {
+                loading.style.display = 'none';
+                userPoints += points;
+                updateBalanceDisplay();
+                showToast(অভিনন্দন! আপনি ${source} থেকে ${points} পয়েন্ট পেয়েছেন।, 'success');
+            }, 3000);
+        }
 
-    .points {
-      font-size: 42px;
-      font-weight: bold;
-      color: #22c55e;
-      margin-top: 10px;
-    }
+        // পেমেন্ট রিকোয়েস্ট ফাংশন
+        function requestWithdraw() {
+            const amount = parseInt(document.getElementById('withdrawAmount').value);
+            const method = document.getElementById('paymentMethod').value;
+            const account = document.getElementById('accountNumber').value;
 
-    button {
-      width: 100%;
-      padding: 16px;
-      font-size: 18px;
-      border: none;
-      border-radius: 14px;
-      background: #22c55e;
-      color: #052e16;
-      font-weight: bold;
-      cursor: pointer;
-    }
+            // ভ্যালিডেশন চেক
+            if (!amount || amount < 1000) {
+                showToast('মিনিমাম ১০০০ পয়েন্ট উইথড্রল করতে হবে।', 'error');
+                return;
+            }
 
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+            if (amount > userPoints) {
+                showToast('আপনার কাছে পর্যাপ্ত পয়েন্ট নেই।', 'error');
+                return;
+            }
 
-    .note {
-      margin-top: 12px;
-      font-size: 13px;
-      color: #94a3b8;
-    }
-  </style>
-</head>
+            if (!account) {
+                showToast('অনুগ্রহ করে আপনার অ্যাকাউন্ট নাম্বার দিন।', 'error');
+                return;
+            }
 
-<body>
-  <div class="app">
-    <h1>💰 EarnVerse</h1>
-    <div class="subtitle">Watch Ads & Earn Points</div>
+            // লোডিং শো করা
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
 
-    <div class="card">
-      <div>Your Points</div>
-      <div class="points" id="points">0</div>
-    </div>
+            // সার্ভারে রিকোয়েস্ট পাঠানোর ভান (সিমুলেশন)
+            setTimeout(() => {
+                loading.style.display = 'none';
+                userPoints -= amount;
+                updateBalanceDisplay();
+                
+                // ফিল্ড ক্লিয়ার করা
+                document.getElementById('withdrawAmount').value = '';
+                document.getElementById('accountNumber').value = '';
 
-    <button id="watchBtn">🎬 Watch Ad & Earn</button>
+                showToast(সফল! ${method}-এ ${amount} পয়েন্ট পাঠানো হয়েছে।, 'success');
+                
+                // টেলিগ্রামে ডাটা পাঠানো (অপশনাল)
+                // sendDataToBot(method, account, amount);
 
-    <div class="note">
-      Watch the full ad to receive points.
-    </div>
-  </div>
+            }, 2000);
+        }
 
-  <script>
-    // Telegram Mini App Init
-    if (window.Telegram && Telegram.WebApp) {
-      Telegram.WebApp.ready();
-      Telegram.WebApp.expand();
-    }
-
-    // Load points
-    let points = parseInt(localStorage.getItem("earnverse_points") || "0");
-    const pointsEl = document.getElementById("points");
-    const btn = document.getElementById("watchBtn");
-
-    pointsEl.innerText = points;
-
-    let adRunning = false;
-
-    btn.onclick = function () {
-      if (adRunning) return;
-
-      if (typeof show_10584434 !== "function") {
-        alert("Ad not ready. Try again later.");
-        return;
-      }
-
-      adRunning = true;
-      btn.disabled = true;
-
-      // Show Monetag rewarded ad
-      show_10584434();
-
-      // Detect return from ad
-      window.onfocus = function () {
-        if (!adRunning) return;
-
-        adRunning = false;
-        window.onfocus = null;
-
-        points += 1;
-        localStorage.setItem("earnverse_points", points);
-        pointsEl.innerText = points;
-
-        alert("✅ You earned 1 point!");
-        btn.disabled = false;
-      };
-    };
-  </script>
-</body>
-</html>
+        // টেলিগ্রাম বটে ডাটা পাঠানোর ফাংশন (ব্যাকএন্ড থাকলে)
+        function sendDataToBot(method, account, amount) {
