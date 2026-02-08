@@ -1,173 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <title>Pro Earn Mini App</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
 <style>
-:root{
-  --bg:#0b1220;
-  --card:#121a2f;
-  --primary:#22c55e;
-  --secondary:#38bdf8;
-  --text:#e5e7eb;
-  --gold:#facc15;
-}
-
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto;
-  background:linear-gradient(180deg,#020617,#0b1220);
-  color:var(--text);
-}
-
-.app{
-  max-width:420px;
-  margin:auto;
-  padding:20px;
-}
-
-.header{
-  text-align:center;
-  margin-bottom:20px;
-}
-
-.header h1{
-  margin:0;
-  font-size:22px;
-}
-
-.card{
-  background:var(--card);
-  border-radius:16px;
-  padding:20px;
-  box-shadow:0 10px 30px rgba(0,0,0,.4);
-  margin-bottom:15px;
-}
-
-.balance{
-  font-size:28px;
-  color:var(--gold);
-  font-weight:700;
-}
-
-.btn{
-  width:100%;
-  padding:15px;
-  border:none;
-  border-radius:14px;
-  font-size:16px;
-  font-weight:600;
-  cursor:pointer;
-  margin-top:10px;
-}
-
-.btn-green{background:var(--primary);color:#022c22}
-.btn-blue{background:var(--secondary);color:#022c22}
-
-.info{
-  font-size:13px;
-  opacity:.8;
-  margin-top:8px;
-}
-
-.footer{
-  text-align:center;
-  font-size:12px;
-  opacity:.5;
-  margin-top:20px;
-}
+body{margin:0;background:#0b1220;color:#fff;font-family:sans-serif}
+.app{max-width:420px;margin:auto;padding:20px}
+.card{background:#121a2f;padding:16px;border-radius:14px;margin-bottom:12px}
+button{width:100%;padding:14px;border:0;border-radius:12px;font-size:16px;margin-top:8px}
+.green{background:#22c55e;color:#022c22}
+.blue{background:#38bdf8;color:#022c22}
 </style>
 </head>
-
 <body>
 <div class="app">
-
-  <div class="header">
-    <h1>🌍 Pro Earn Mini App</h1>
-    <div id="user">Loading...</div>
+  <div class="card">
+    <h3 id="user">Loading...</h3>
+    💰 Balance: <b id="bal">0.00</b>
   </div>
 
   <div class="card">
-    <div>💰 Balance</div>
-    <div class="balance" id="balance">0.00</div>
-    <div class="info">Daily limit applies</div>
+    <button class="green" onclick="earn('monetag')">🔥 Earn (Monetag)</button>
+    <button class="blue" onclick="earn('adsterra')">🎯 Earn (Adsterra)</button>
+    <div id="msg"></div>
   </div>
 
   <div class="card">
-    <button class="btn btn-green" onclick="earnMonetag()">🔥 Earn via Monetag</button>
-    <button class="btn btn-blue" onclick="earnAdsterra()">🎯 Earn via Adsterra</button>
-    <div class="info" id="msg"></div>
+    👥 Referral:
+    <input id="ref" readonly style="width:100%">
   </div>
-
-  <div class="footer">
-    Secure • Fast • Cloudflare Powered
-  </div>
-
 </div>
-
-<script>
-/* ===== Telegram Init ===== */
-let tg = window.Telegram.WebApp;
-tg.expand();
-
-/* ===== User Info ===== */
-const user = tg.initDataUnsafe?.user;
-document.getElementById("user").innerText =
-  user ? 👤 ${user.first_name} : "Guest User";
-
-/* ===== Storage ===== */
-let balance = parseFloat(localStorage.getItem("balance")) || 0;
-let clicks = parseInt(localStorage.getItem("clicks")) || 0;
-let lastDay = localStorage.getItem("day");
-
-const today = new Date().toDateString();
-if(lastDay !== today){
-  clicks = 0;
-  localStorage.setItem("day", today);
-  localStorage.setItem("clicks", 0);
-}
-
-/* ===== Update UI ===== */
-function updateUI(){
-  document.getElementById("balance").innerText = balance.toFixed(2);
-}
-updateUI();
-
-/* ===== Core Logic ===== */
-function canEarn(){
-  if(clicks >= 5){
-    document.getElementById("msg").innerText =
-      "❌ Daily earning limit reached";
-    return false;
-  }
-  clicks++;
-  localStorage.setItem("clicks", clicks);
-  return true;
-}
-
-function reward(){
-  balance += 0.02;
-  localStorage.setItem("balance", balance);
-  updateUI();
-}
-
-/* ===== Ads ===== */
-function earnMonetag(){
-  if(!canEarn()) return;
-  window.open("https://YOUR_MONETAG_DIRECT_LINK","_blank");
-  setTimeout(reward, 8000);
-}
-
-function earnAdsterra(){
-  if(!canEarn()) return;
-  window.open("https://YOUR_ADSTERRA_DIRECT_LINK","_blank");
-  setTimeout(reward, 8000);
-}
-</script>
+<script src="app.js"></script>
 </body>
 </html>
