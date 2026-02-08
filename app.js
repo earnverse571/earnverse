@@ -1,59 +1,44 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: system-ui, sans-serif;
+let points = parseInt(localStorage.getItem("points") || "0");
+
+const pointEl = document.getElementById("points");
+const watchBtn = document.getElementById("watchBtn");
+
+pointEl.innerText = points;
+
+// Telegram init
+if (window.Telegram?.WebApp) {
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
 }
 
-body {
-  background: #0b1220;
-  color: #fff;
-}
+let adRunning = false;
 
-.app {
-  max-width: 420px;
-  margin: auto;
-  padding: 20px;
-  text-align: center;
-}
+watchBtn.addEventListener("click", () => {
+  if (adRunning) return;
 
-h1 {
-  margin-top: 20px;
-}
+  if (typeof show_10584434 !== "function") {
+    alert("Ad not ready. Try again.");
+    return;
+  }
 
-.subtitle {
-  opacity: 0.8;
-  margin-bottom: 20px;
-}
+  adRunning = true;
+  watchBtn.disabled = true;
 
-.card {
-  background: #121a2f;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-}
+  // Show Monetag Ad
+  show_10584434();
 
-.card h2 {
-  color: #22c55e;
-  font-size: 36px;
-}
+  // When user returns from ad
+  window.onfocus = () => {
+    if (!adRunning) return;
 
-button {
-  width: 100%;
-  padding: 15px;
-  background: #22c55e;
-  border: none;
-  border-radius: 10px;
-  font-size: 18px;
-  cursor: pointer;
-}
+    adRunning = false;
+    window.onfocus = null;
 
-button:disabled {
-  background: gray;
-}
+    points += 1;
+    localStorage.setItem("points", points);
+    pointEl.innerText = points;
 
-.hint {
-  margin-top: 15px;
-  font-size: 14px;
-  opacity: 0.7;
-}
+    alert("✅ You earned 1 point!");
+    watchBtn.disabled = false;
+  };
+});
