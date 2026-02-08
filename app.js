@@ -1,26 +1,59 @@
-const tg = window.Telegram.WebApp;
-tg.ready();
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
 
-let points = localStorage.getItem("earnverse_points")
-  ? parseInt(localStorage.getItem("earnverse_points"))
-  : 0;
+body {
+  background: #0b1220;
+  color: #fff;
+}
 
-const pointsEl = document.getElementById("points");
-const watchBtn = document.getElementById("watchAdBtn");
+.app {
+  max-width: 420px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+}
 
-pointsEl.innerText = points;
+h1 {
+  margin-top: 20px;
+}
 
-watchBtn.addEventListener("click", () => {
-  try {
-    show_10584434();
+.subtitle {
+  opacity: 0.8;
+  margin-bottom: 20px;
+}
 
-    setTimeout(() => {
-      points += 10;
-      localStorage.setItem("earnverse_points", points);
-      pointsEl.innerText = points;
-    }, 3000);
+.card {
+  background: #121a2f;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
 
-  } catch (e) {
-    alert("Ad not available. Try again later.");
-  }
-});
+.card h2 {
+  color: #22c55e;
+  font-size: 36px;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  background: #22c55e;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: gray;
+}
+
+.hint {
+  margin-top: 15px;
+  font-size: 14px;
+  opacity: 0.7;
+}
