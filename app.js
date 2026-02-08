@@ -1,30 +1,30 @@
-let tg = window.Telegram.WebApp;
+const tg = Telegram.WebApp;
 tg.expand();
 
 const user = tg.initDataUnsafe?.user;
-
 document.getElementById("user").innerText =
-  user ? 👤 ${user.first_name} : "Welcome Guest";
+  user ? "👤 " + user.first_name : "Guest";
 
-let clicks = localStorage.getItem("clicks") || 0;
+const uid = user?.id || "guest";
+const api = "https://YOUR_WORKER_URL";
 
-function limitCheck(){
-  if(clicks >= 5){
-    document.getElementById("msg").innerText =
-      "❌ Daily limit reached!";
-    return false;
+let bal = Number(localStorage.getItem("bal")) || 0;
+document.getElementById("bal").innerText = bal.toFixed(2);
+
+document.getElementById("ref").value =
+  https://t.me/YOUR_BOT?start=${uid};
+
+async function earn(type){
+  const r = await fetch(${api}?uid=${uid}&type=${type});
+  const d = await r.json();
+  if(!d.ok){
+    document.getElementById("msg").innerText = d.msg;
+    return;
   }
-  clicks++;
-  localStorage.setItem("clicks", clicks);
-  return true;
-}
-
-function openMonetag(){
-  if(!limitCheck()) return;
-  window.open("https://YOUR_MONETAG_DIRECT_LINK", "_blank");
-}
-
-function openAdsterra(){
-  if(!limitCheck()) return;
-  window.open("https://YOUR_ADSTERRA_DIRECT_LINK", "_blank");
+  window.open(d.link,"_blank");
+  setTimeout(()=>{
+    bal += d.reward;
+    localStorage.setItem("bal",bal);
+    document.getElementById("bal").innerText = bal.toFixed(2);
+  },10000);
 }
