@@ -1,75 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
   <title>EarnVerse</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    body{
-      margin:0;
-      font-family: Arial, sans-serif;
-      background:#0b1220;
-      color:#fff;
-      text-align:center;
-    }
-    header{
-      padding:20px;
-      background:#121a2f;
-      font-size:22px;
-      font-weight:bold;
-    }
-    .box{
-      background:#121a2f;
-      margin:20px;
-      padding:20px;
-      border-radius:10px;
-    }
-    button{
-      padding:15px 25px;
-      border:none;
-      border-radius:8px;
-      background:#22c55e;
-      color:#000;
-      font-size:16px;
-      cursor:pointer;
-      margin-top:10px;
-    }
-    .points{
-      font-size:26px;
-      margin:15px 0;
-      color:#22c55e;
-    }
-  </style>
 </head>
-
 <body>
-
-<header>💸 EarnVerse</header>
-
-<div class="box">
-  <p>Your Points</p>
-  <div class="points" id="points">0</div>
-</div>
-
-<div class="box">
-  <p>Watch ads & earn points</p>
-  <button onclick="watchAd()">Watch Ad</button>
-</div>
-
-<script>
-  let points = localStorage.getItem("points") || 0;
-  document.getElementById("points").innerText = points;
-
-  function watchAd(){
-    points = parseInt(points) + 10;
-    localStorage.setItem("points", points);
-    document.getElementById("points").innerText = points;
-
-    // Ad redirect (later Monetag/Adsterra)
-    window.open("https://example.com","_blank");
-  }
-</script>
-
+  <h1>EarnVerse Mini App</h1>
 </body>
 </html>
