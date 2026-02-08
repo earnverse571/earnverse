@@ -3,39 +3,146 @@
 <head>
   <meta charset="UTF-8" />
   <title>EarnVerse</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Telegram Web App -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
   <!-- Monetag SDK -->
   <script src="//libtl.com/sdk.js"
-    data-zone="10584434"
-    data-sdk="show_10584434">
-  </script>
+          data-zone="10584434"
+          data-sdk="show_10584434"></script>
 
-  <link rel="stylesheet" href="style.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #0b1220, #020617);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 10px 0 5px;
+    }
+
+    .subtitle {
+      color: #94a3b8;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background: #111827;
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+
+    .points {
+      font-size: 42px;
+      font-weight: bold;
+      color: #22c55e;
+      margin-top: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      border: none;
+      border-radius: 14px;
+      background: #22c55e;
+      color: #052e16;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .note {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+  </style>
 </head>
 
 <body>
   <div class="app">
-
     <h1>💰 EarnVerse</h1>
-    <p class="subtitle">Watch Ads & Earn Points</p>
+    <div class="subtitle">Watch Ads & Earn Points</div>
 
     <div class="card">
-      <p>Your Points</p>
-      <h2 id="points">0</h2>
+      <div>Your Points</div>
+      <div class="points" id="points">0</div>
     </div>
 
     <button id="watchBtn">🎬 Watch Ad & Earn</button>
 
-    <p class="hint">
-      Click the button, watch the ad and earn rewards.
-    </p>
-
+    <div class="note">
+      Watch the full ad to receive points.
+    </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    // Telegram Mini App Init
+    if (window.Telegram && Telegram.WebApp) {
+      Telegram.WebApp.ready();
+      Telegram.WebApp.expand();
+    }
+
+    // Load points
+    let points = parseInt(localStorage.getItem("earnverse_points") || "0");
+    const pointsEl = document.getElementById("points");
+    const btn = document.getElementById("watchBtn");
+
+    pointsEl.innerText = points;
+
+    let adRunning = false;
+
+    btn.onclick = function () {
+      if (adRunning) return;
+
+      if (typeof show_10584434 !== "function") {
+        alert("Ad not ready. Try again later.");
+        return;
+      }
+
+      adRunning = true;
+      btn.disabled = true;
+
+      // Show Monetag rewarded ad
+      show_10584434();
+
+      // Detect return from ad
+      window.onfocus = function () {
+        if (!adRunning) return;
+
+        adRunning = false;
+        window.onfocus = null;
+
+        points += 1;
+        localStorage.setItem("earnverse_points", points);
+        pointsEl.innerText = points;
+
+        alert("✅ You earned 1 point!");
+        btn.disabled = false;
+      };
+    };
+  </script>
 </body>
 </html>
