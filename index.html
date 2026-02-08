@@ -1,0 +1,103 @@
+// লোকাল স্টোরেজ থেকে ডাটা লোড করা
+        let userPoints = localStorage.getItem('points') ? parseInt(localStorage.getItem('points')) : 0;
+        
+        // কনভার্সন রেট (উদাহরণ: ১০০০ পয়েন্ট = $১)
+        const conversionRate = 0.001; 
+
+        // পেজ লোড হলে ব্যালেন্স আপডেট করা
+        updateBalanceDisplay();
+
+        // ব্যালেন্স আপডেট করার ফাংশন
+        function updateBalanceDisplay() {
+            document.getElementById('userPoints').innerText = userPoints;
+            document.getElementById('usdValue').innerText = (userPoints * conversionRate).toFixed(2);
+            localStorage.setItem('points', userPoints); // সেভ করা
+        }
+
+        // টোস্ট মেসেজ দেখানোর ফাংশন
+        function showToast(message, type = 'normal') {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.className = 'toast show';
+            if (type === 'success') toast.classList.add('success');
+            if (type === 'error') toast.classList.add('error');
+            
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 3000);
+        }
+
+        // Monetag এড সিমুলেশন
+        function showMonetagAd() {
+            // আসল কোডে এখানে Monetag-এর স্ক্রিপ্ট বসবে
+            // উদাহরণ: window.monetag.showAd();
+            
+            simulateAdProcess(100, "Monetag");
+        }
+
+        // Adstora এড সিমুলেশন
+        function showAdstoraAd() {
+            // আসল কোডে এখানে Adstora-এর স্ক্রিপ্ট বসবে
+            simulateAdProcess(80, "Adstora");
+        }
+
+        // এড দেখার প্রসেস (সিমুলেশন)
+        function simulateAdProcess(points, source) {
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+
+            // ৩ সেকেন্ড এড দেখার ভান করা হচ্ছে
+            setTimeout(() => {
+                loading.style.display = 'none';
+                userPoints += points;
+                updateBalanceDisplay();
+                showToast(অভিনন্দন! আপনি ${source} থেকে ${points} পয়েন্ট পেয়েছেন।, 'success');
+            }, 3000);
+        }
+
+        // পেমেন্ট রিকোয়েস্ট ফাংশন
+        function requestWithdraw() {
+            const amount = parseInt(document.getElementById('withdrawAmount').value);
+            const method = document.getElementById('paymentMethod').value;
+            const account = document.getElementById('accountNumber').value;
+
+            // ভ্যালিডেশন চেক
+            if (!amount || amount < 1000) {
+                showToast('মিনিমাম ১০০০ পয়েন্ট উইথড্রল করতে হবে।', 'error');
+                return;
+            }
+
+            if (amount > userPoints) {
+                showToast('আপনার কাছে পর্যাপ্ত পয়েন্ট নেই।', 'error');
+                return;
+            }
+
+            if (!account) {
+                showToast('অনুগ্রহ করে আপনার অ্যাকাউন্ট নাম্বার দিন।', 'error');
+                return;
+            }
+
+            // লোডিং শো করা
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+
+            // সার্ভারে রিকোয়েস্ট পাঠানোর ভান (সিমুলেশন)
+            setTimeout(() => {
+                loading.style.display = 'none';
+                userPoints -= amount;
+                updateBalanceDisplay();
+                
+                // ফিল্ড ক্লিয়ার করা
+                document.getElementById('withdrawAmount').value = '';
+                document.getElementById('accountNumber').value = '';
+
+                showToast(সফল! ${method}-এ ${amount} পয়েন্ট পাঠানো হয়েছে।, 'success');
+                
+                // টেলিগ্রামে ডাটা পাঠানো (অপশনাল)
+                // sendDataToBot(method, account, amount);
+
+            }, 2000);
+        }
+
+        // টেলিগ্রাম বটে ডাটা পাঠানোর ফাংশন (ব্যাকএন্ড থাকলে)
+        function sendDataToBot(method, account, amount) {
