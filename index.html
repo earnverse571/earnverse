@@ -1,9 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>EarnVerse</title>
+  <meta charset="UTF-8">
+  <title>EarnVerse Mini App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Telegram Mini App -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Monetag SDK -->
+  <script src='//libtl.com/sdk.js'
+          data-zone='10584434'
+          data-sdk='show_10584434'></script>
+
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <h1>EarnVerse Mini App</h1>
+  <div class="app">
+    <h1>💰 EarnVerse</h1>
+    <p class="subtitle">Watch Ads & Earn Points</p>
+
+    <div class="card">
+      <h2>Your Points</h2>
+      <div id="points">0</div>
+    </div>
+
+    <button id="watchAdBtn">🎥 Watch Ad & Earn</button>
+
+    <p class="note">
+      Click the button, watch the ad and earn rewards.
+    </p>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
