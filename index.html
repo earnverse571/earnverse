@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ad Earning Mini App</title>
+
+    <!-- Monetag Rewarded Ads -->
+    <script src='//libtl.com/sdk.js' data-zone='10584434' data-sdk='show_10584434'></script>
+
+    <style>
+        :root {
+            --bg: #eef2ff;
+            --card: rgba(255, 255, 255, .9);
+            --text: #0f172a;
+            --accent: #6366f1;
+            --shadow: 0 25px 60px rgba(0, 0, 0, .2);
+        }
+
+        body.dark {
+            --bg: #020617;
+            --card: #020617cc;
+            --text: #e5e7eb;
+            --accent: #22d3ee
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui;
+            background: linear-gradient(135deg, var(--bg), #00000010);
+            color: var(--text);
+            transition: .4s;
+        }
+
+        .container {
+            padding: 16px;
+            padding-bottom: 100px
+        }
+
+        .section {
+            display: none
+        }
+
+        .section.active {
+            display: block
+        }
+
+        .card {
+            background: var(--card);
+            backdrop-filter: blur(14px);
+            border-radius: 24px;
+            padding: 18px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .center {
+            text-align: center
+        }
+
+        .small {
+            font-size: 13px;
+            opacity: .75
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 999px;
+            font-size: 15px;
+            font-weight: 700;
+            margin-top: 12px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent), #000);
+            box-shadow: 0 15px 35px var(--accent);
+        }
+
+        .btn.off {
+            background: #64748b;
+            box-shadow: none
+        }
+
+        .nav {
+            position: fixed;
+            bottom: 12px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            gap: 6px;
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            padding: 10px;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .nav button {
+            flex: 1;
+            border: none;
+            background: none;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .nav .active {
+            background: linear-gradient(135deg, var(--accent), #000);
+            color: #fff;
+            border-radius: 14px;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 13px;
+            border-radius: 16px;
+            border: none;
+            margin-top: 10px;
+            background: #00000010;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- HOME -->
+        <section id="home" class="section active">
+            <div class="card center">
+                <div class="small">Balance</div>
+                <h1 id="balance">$0.00</h1>
+                <div class="small" id="dailyInfo"></div>
+                <div class="small" id="clock"></div>
+            </div>
+
+            <div class="card">
+                <h3>📜 Rules</h3>
+                <ul class="small" id="rulesText"></ul>
+            </div>
+
+            <div class="card center">
+                <h3>🎁 Daily Bonus</h3>
+                <div class="small" id="bonusStatus"></div>
+                <button class="btn" id="bonusBtn" onclick="claimBonus()">Claim 30</button>
+            </div>
+        </section>
+
+        <!-- WATCH -->
+        <section id="watch" class="section">
+            <div class="card">
+                <h3>🎥 Watch Ad</h3>
+                <div class="small" id="cooldownText">Ready</div>
+                <div class="small" id="nextAdTimer"></div>
+                <div class="small" id="dailyResetTimer"></div>
+                <button class="btn" onclick="watchAd()">Watch 15s Ad</button>
+            </div>
+        </section>
+
+        <!-- HISTORY -->
+        <section id="history" class="section">
+            <div class="card">
+                <h3>🧾 Transaction History</h3>
+                <ul id="historyList"></ul>
+            </div>
+        </section>
+
+        <!-- WITHDRAW -->
+        <section id="withdraw" class="section">
+            <div class="card">
+                <h3>💳 Withdraw</h3>
+                <select id="wMethod" onchange="updateWithdraw()">
+                    <option value="">Select Method</option>
+                    <option value="bkash">bKash</option>
+                    <option value="nagad">Nagad</option>
+                    <option value="rocket">Rocket</option>
+                    <option value="binance">Binance</option>
+                </select>
+                <input id="wAccount" style="display:none">
+                <input id="wAmount" style="display:none" placeholder="Amount">
+                <button class="btn" onclick="submitWithdraw()">Submit Withdraw</button>
+            </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="settings" class="section">
+            <div class="card">
+                <h3>⚙ Settings</h3>
+                <select onchange="setLang(this.value)">
+                    <option value="en">English</option>
+                    <option value="bn">বাংলা</option>
+                    <option value="hi">हिंदी</option>
+                </select>
+                <select onchange="setCurrency(this.value)">
+                    <option>USD</option>
+                    <option>BDT</option>
+                    <option>INR</option>
+                </select>
+                <select onchange="setTheme(this.value)">
+                    <option value="">Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+            </div>
+        </section>
+
+    </div>
+
+    <div class="nav">
+        <button class="active" onclick="go('home',this)">Home</button>
+        <button onclick="go('watch',this)">Watch</button>
+        <button onclick="go('history',this)">History</button>
+        <button onclick="go('withdraw',this)">Withdraw</button>
+        <button onclick="go('settings',this)">Settings</button>
+    </div>
+
+    <script>
+        /* CONFIG */
+        const AD_REWARD = 0.05,
+            BONUS = 0.30;
+        const DAILY_LIMIT = 20,
+            COOLDOWN = 30;
+        const RATE = {
+            USD: 1,
+            BDT: 110,
+            INR: 83
+        };
+
+        /* STATE */
+        let balance = +localStorage.balance || 0;
+        let adsToday = +localStorage.adsToday || 0;
+        let lastAd = +localStorage.lastAd || 0;
+        let lastBonus = +localStorage.lastBonus || 0;
+        let dayStamp = localStorage.dayStamp || new Date().toDateString();
+        let currency = localStorage.currency || "USD";
+        let lang = localStorage.lang || "en";
+
+        /* DAILY RESET CHECK */
+        function checkDailyReset() {
+            const today = new Date().toDateString();
+            if (dayStamp !== today) {
+                adsToday = 0;
+                dayStamp = today;
+                localStorage.adsToday = 0;
+                localStorage.dayStamp = today;
+            }
+        }
+        checkDailyReset();
+
+        /* CLOCK */
+        setInterval(() => {
+            clock.innerText = new Date().toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+        }, 1000);
+
+        /* UI */
+        const balanceEl = document.getElementById("balance");
+
+        function updateUI() {
+            const s = currency === "BDT" ? "৳" : currency === "INR" ? "₹" : "$";
+            balanceEl.innerText = s + (balance * RATE[currency]).toFixed(2);
+            dailyInfo.innerText = `Ads today: ${adsToday}/${DAILY_LIMIT}`;
+        }
+        updateUI();
+
+        /* HISTORY */
+        historyList.innerHTML = localStorage.history || "";
+
+        function log(t) {
+            const li = document.createElement("li");
+            li.innerText = new Date().toLocaleString() + " - " + t;
+            historyList.prepend(li);
+            localStorage.history = historyList.innerHTML;
+        }
+
+        /* WATCH */
+        function canWatch() {
+            checkDailyReset();
+            return adsToday < DAILY_LIMIT && (Date.now() / 1000 - lastAd) >= COOLDOWN;
+        }
+
+        function watchAd() {
+            if (!canWatch()) return;
+            cooldownText.innerText = "Watching ad...";
+            show_10584434();
+            setTimeout(() => {
+                balance += AD_REWARD;
+                adsToday++;
+                lastAd = Date.now() / 1000;
+                localStorage.balance = balance;
+                localStorage.adsToday = adsToday;
+                localStorage.lastAd = lastAd;
+                log("🎥 Ad watched +0.05");
+                updateUI();
+                cooldownText.innerText = "Completed";
+                setTimeout(() => go('home', document.querySelector('.nav button')), 5000);
+            }, 15000);
+        }
+
+        /* NEXT AD + DAILY RESET COUNTDOWN */
+        setInterval(() => {
+            checkDailyReset();
+
+            let cd = Math.max(0, COOLDOWN - (Date.now() / 1000 - lastAd));
+            nextAdTimer.innerText = cd === 0 ? "Ad Ready" : `Next ad in ${Math.ceil(cd)}s`;
+
+            let now = new Date();
+            let midnight = new Date();
+            midnight.setHours(24, 0, 0, 0);
+            let diff = (midnight - now) / 1000;
+            let h = Math.floor(diff / 3600);
+            let m = Math.floor((diff % 3600) / 60);
+            let s = Math.floor(diff % 60);
+            dailyResetTimer.innerText =
+                adsToday >= DAILY_LIMIT ?
+                `Daily limit reset in ${h}h ${m}m ${s}s` :
+                `Daily reset in ${h}h ${m}m ${s}s`;
+        }, 1000);
+
+        /* BONUS */
+        function updateBonus() {
+            let rem = 86400 - (Date.now() - lastBonus) / 1000;
+            if (rem <= 0) {
+                bonusStatus.innerText = "Ready";
+                bonusBtn.disabled = false;
+            } else {
+                let h = Math.floor(rem / 3600),
+                    m = Math.floor((rem % 3600) / 60),
+                    s = Math.floor(rem % 60);
+                bonusStatus.innerText = `Next bonus in ${h}h ${m}m ${s}s`;
+                bonusBtn.disabled = true;
+            }
+        }
+
+        function claimBonus() {
+            if (Date.now() - lastBonus < 86400000) return;
+            balance += BONUS;
+            lastBonus = Date.now();
+            localStorage.balance = balance;
+            localStorage.lastBonus = lastBonus;
+            log("🎁 Daily bonus +0.30");
+            updateUI();
+            updateBonus();
+        }
+        setInterval(updateBonus, 1000);
+        updateBonus();
+
+        /* WITHDRAW */
+        function updateWithdraw() {
+            wAccount.style.display = "none";
+            wAmount.style.display = "none";
+            if (!wMethod.value) return;
+            wAccount.style.display = "block";
+            wAmount.style.display = "block";
+            wAccount.placeholder = wMethod.value === "binance" ? "Binance UID" : "Account Number";
+        }
+
+        function submitWithdraw() {
+            if (balance < 10) return alert("Minimum withdraw $10");
+            let amt = +wAmount.value;
+            if (!wAccount.value || amt <= 0 || amt > balance) return alert("Invalid data");
+            balance -= amt;
+            localStorage.balance = balance;
+            log("💳 Withdraw submitted");
+            updateUI();
+            alert("Withdraw submitted");
+        }
+
+        /* SETTINGS */
+        function setCurrency(c) {
+            currency = c;
+            localStorage.currency = c;
+            updateUI()
+        }
+
+        function setTheme(t) {
+            document.body.className = t;
+            localStorage.theme = t
+        }
+        document.body.className = localStorage.theme || "";
+
+        /* LANGUAGE */
+        const RULES = {
+            en: ["Must watch full 15 seconds", "Next ad after cooldown", "Daily ad limit applies"],
+            bn: ["১৫ সেকেন্ড সম্পূর্ণ দেখতে হবে", "কুলডাউনের পর পরবর্তী বিজ্ঞাপন", "দৈনিক বিজ্ঞাপন সীমা"],
+            hi: ["15 सेकंड पूरा देखना होगा", "कूलडाउन के बाद अगला ऐड", "डेली ऐड लिमिट"]
+        };
+
+        function setLang(l) {
+            lang = l;
+            localStorage.lang = l;
+            rulesText.innerHTML = RULES[l].map(r => "<li>" + r + "</li>").join("");
+        }
+        setLang(lang);
+
+        /* NAV */
+        function go(id, b) {
+            document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+            document.getElementById(id).classList.add("active");
+            document.querySelectorAll(".nav button").forEach(x => x.classList.remove("active"));
+            b.classList.add("active");
+        }
+    </script>
+</body>
+
+</html>
